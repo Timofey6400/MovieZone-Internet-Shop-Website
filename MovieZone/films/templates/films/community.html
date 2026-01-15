@@ -1,0 +1,444 @@
+<!doctype html>
+<html>
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сообщество MovieZone 👤</title>
+   <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<script src="{% static 'js/script.js' %}" defer></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="steam-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img class="logo" src="{% static 'films\logo.png' %}" width="175px" height="75px" border-radius="10px" alt="Logotype">
+      </div>
+      <nav class="main-nav">
+        <a href="{% url 'films:index' %}" class="nav-link">МАГАЗИН</a>
+        <a href="{% url 'films:library' %}" class="nav-link">БИБЛИОТЕКА</a>
+        <a href="{% url 'films:community' %}" class="nav-link active">СООБЩЕСТВО</a>
+        <a href="{% url 'films:favorites_list' %}" class="nav-link">ИЗБРАННОЕ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="{% url 'films:cart' %}" class="cart-link" title="Корзина"><i class="fa-solid fa-cart-shopping"></i></a>
+      </div>
+        </form>
+        {% if user.is_authenticated %}
+          <span style="color: #c7d5e0;">{{ user.username }}</span>
+          <a href="{% url 'films:logout' %}" class="steam-btn" style="width: auto; padding: 8px 16px; background: linear-gradient(to bottom, #a84828 0%, #7d341f 100%);">
+            Выход
+          </a>
+        {% else %}
+          <a href="{% url 'films:login' %}" class="steam-btn steam-btn-primary" style="width: auto; padding: 8px 16px;">
+            Войти
+          </a>
+          <a href="{% url 'films:register' %}" class="steam-btn" style="width: auto; padding: 8px 16px; background: linear-gradient(to bottom, #75b022 0%, #558a0f 100%);">
+            Регистрация
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="steam-container">
+    <div class="main-content" style="padding: 30px 20px; max-width: 1200px; margin: 0 auto;">
+      <div class="page-header">
+        <h1 class="page-title">СООБЩЕСТВО</h1>
+        <p class="page-subtitle">Присоединяйтесь к обсуждениям!</p>
+      </div>
+
+      <div class="community-section">
+        <div class="section-header">
+          <h2 class="section-title">ОБСУЖДЕНИЯ</h2>
+        </div>
+        <div class="discussions-list">
+          <div class="discussion-item">
+            <div class="discussion-content">
+              <h3 class="discussion-title">Лучшие фильмы\сериалы 2025</h3>
+              <p class="discussion-text">Расскажите своё мнение; какие сериалы вам понравились больше всего?</p>
+            </div>
+            <div class="discussion-meta">
+          <a class="discussion-comments"><i class="fa-solid fa-comment"></i> 99+</a>
+            </div>
+          </div>
+          <div class="discussion-item">
+            <div class="discussion-content">
+              <h3 class="discussion-title">ОСД или Декстер Морган?</h3>
+              <p class="discussion-text">Вопрос жизни и смерти: какой сериал для Вас лучше?</p>
+            </div>
+            <div class="discussion-meta">
+          <a class="discussion-comments"><i class="fa-solid fa-comment"></i> 99+</a>
+            </div>
+          </div>
+          <div class="discussion-item">
+            <div class="discussion-content">
+              <h3 class="discussion-title">Лучший антагонист</h3>
+              <p class="discussion-text">Кто лучший антагонист в истории кино?</p>
+            </div>
+            <div class="discussion-meta">
+              <a class="discussion-comments"><i class="fa-solid fa-comment"></i> 78</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="community-section">
+        <div class="section-header">
+          <h2 class="section-title">ЗАЯДЛЫЕ КИНОМАНЫ</h2>
+        </div>
+        <div class="users-grid">
+          <div class="user-card">
+            <div class="user-avatar">👤</div>
+            <div class="user-name">Пользователь</div>
+            <div class="user-stats">1231 ч.</div>
+          </div>
+          <div class="user-card">
+            <div class="user-avatar">🤖</div>
+            <div class="user-name">Пользователь</div>
+            <div class="user-stats">1697 ч.</div>
+          </div>
+          <div class="user-card">
+            <div class="user-avatar">👤</div>
+            <div class="user-name">Пользователь</div>
+            <div class="user-stats">948 ч.</div>
+          </div>
+          <div class="user-card">
+            <div class="user-avatar">😝</div>
+            <div class="user-name">Пользователь</div>
+            <div class="user-stats">2019 ч.</div>
+          </div>
+          <div class="user-card">
+            <div class="user-avatar">👑</div>
+            <div class="user-name">Пользователь</div>
+            <div class="user-stats">3762 ч.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="community-section">
+        <div class="section-header">
+          <h2 class="section-title">СОЗДАТЬ ОБСУЖДЕНИЕ</h2>
+        </div>
+        <form class="discussion-form">
+          <input type="text" placeholder="Заголовок обсуждения" class="form-input">
+          <textarea placeholder="Текст сообщения" class="form-textarea"></textarea>
+          <button type="submit" class="steam-btn steam-btn-primary" style="width: auto; display: inline-block;">
+            Опубликовать
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background: #1b2838;
+    font-family: "Motiva Sans", "Segoe UI", Arial, sans-serif;
+    color: #c7d5e0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.steam-header {
+    background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+    border-bottom: 1px solid #000;
+    box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header-content {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 104px;
+    gap: 30px;
+}
+.logo-section {
+    flex-shrink: 0;
+}
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #66c0f4;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border-radius: 11px;
+}
+.logo:hover {
+    color: #ffffff;
+}
+.main-nav {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+.nav-link {
+    padding: 0 20px;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    color: #b8b6b4;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+.nav-link:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.05);
+}
+.nav-link.active {
+    color: #ffffff;
+    border-bottom-color: #66c0f4;
+    background: rgba(102,192,244,0.1);
+}
+.search-section {
+    flex-shrink: 0;
+}
+.search-form {
+    display: flex;
+    align-items: center;
+    background: #316282;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.search-input {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #ffffff;
+    font-size: 13px;
+    width: 250px;
+    outline: none;
+}
+.search-input::placeholder {
+    color: #8f98a0;
+}
+.search-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #c7d5e0;
+    cursor: pointer;
+    font-size: 16px;
+}
+.search-btn:hover {
+    color: #ffffff;
+}
+.steam-container {
+    max-width: 1920px;
+    margin: 0 auto;
+}
+.page-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(102,192,244,0.2);
+}
+.page-title {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.page-subtitle {
+    color: #8f98a0;
+    font-size: 14px;
+    margin: 0;
+}
+.community-section {
+    background: linear-gradient(135deg, #1e2329 0%, #2a475e 100%);
+    border-radius: 3px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(102,192,244,0.1);
+}
+.section-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(102,192,244,0.2);
+}
+.section-title {
+    color: #66c0f4;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.discussions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.discussion-item {
+    background: rgba(27,40,56,0.5);
+    border-radius: 3px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+.discussion-item:hover {
+    background: rgba(27,40,56,0.8);
+    border-color: rgba(102,192,244,0.3);
+}
+.discussion-content {
+    flex: 1;
+}
+.discussion-title {
+    color: #66c0f4;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+.discussion-text {
+    color: #c7d5e0;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+}
+.discussion-meta {
+    margin-left: 20px;
+}
+.discussion-comments {
+    color: #8f98a0;
+    font-size: 13px;
+}
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+.user-card {
+    background: rgba(27,40,56,0.5);
+    border-radius: 3px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+.user-card:hover {
+    background: rgba(27,40,56,0.8);
+    border-color: rgba(102,192,244,0.3);
+}
+.user-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #66c0f4 0%, #3d9bc4 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    margin: 0 auto 12px;
+}
+.user-name {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+.user-stats {
+    color: #8f98a0;
+    font-size: 12px;
+}
+.discussion-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.form-input,
+.form-textarea {
+    background: rgba(27,40,56,0.8);
+    border: 1px solid rgba(102,192,244,0.2);
+    border-radius: 3px;
+    padding: 12px;
+    color: #c7d5e0;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.form-input:focus,
+.form-textarea:focus {
+    border-color: #66c0f4;
+    background: rgba(27,40,56,1);
+}
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+.steam-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: linear-gradient(to bottom, #75b022 0%, #558a0f 100%);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.15s;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+.steam-btn-primary {
+    background: linear-gradient(to bottom, #66c0f4 0%, #3d9bc4 100%);
+}
+.steam-btn-primary:hover {
+    background: linear-gradient(to bottom, #7dd0ff 0%, #4db0e0 100%);
+    box-shadow: 0 0 8px rgba(102,192,244,0.4);
+}
+@media (max-width: 1024px) {
+    .header-content {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 15px 20px;
+    }
+    .main-nav {
+        order: 3;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .nav-link {
+        height: 50px;
+        flex: 1;
+        justify-content: center;
+    }
+    .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+@media (max-width: 768px) {
+    .search-input {
+        width: 150px;
+    }
+}
+</style>
+<style>
+  .cart-link{ font-size:20px; color:#c7d5e0; text-decoration:none; padding:6px 10px; border-radius:4px }
+  .cart-link:hover{ background: rgba(255,255,255,0.03); color:#fff }
+</style>
+</style>
