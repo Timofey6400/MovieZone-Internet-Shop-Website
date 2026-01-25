@@ -1,0 +1,808 @@
+<!doctype html>
+<html>
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{% static 'films\logo.png' %}" type="image/png">
+  <title>MovieZone</title>
+   <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<script src="{% static 'js/script.js' %}" defer></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+  <div class="steam-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img class="logo" src="{% static 'films\logo.png' %}" width="175px" height="75px" border-radius="10px" alt="Logotype">
+      </div>
+      <nav class="main-nav">
+        <a href="{% url 'films:index' %}" class="nav-link active">МАГАЗИН</a>
+        <a href="{% url 'films:library' %}" class="nav-link">БИБЛИОТЕКА</a>
+        <a href="{% url 'films:community' %}" class="nav-link">СООБЩЕСТВО</a>
+        <a href="{% url 'films:favorites_list' %}" class="nav-link">ИЗБРАННОЕ</a>
+      </nav>
+      <div class="search-section" style="display: flex; gap: 10px; align-items: center;">
+        <a href="{% url 'films:cart' %}" class="cart-link" title="Корзина" aria-label="Корзина"><i class="fa-solid fa-cart-shopping"></i></a>
+        <form method="get" action="." class="search-form">
+          <input type="text" name="q" placeholder="Search..." value="{{ query }}" class="search-input">
+          <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        </form>
+        {% if user.is_authenticated %}
+          <div class="user-menu">
+            <span style="color: #c7d5e0; margin-right: 10px;">{{ user.username }}</span>
+            <a href="{% url 'films:logout' %}" class="steam-btn" style="width: auto; padding: 8px 16px; background: linear-gradient(to bottom, #a84828 0%, #7d341f 100%);">
+              Выход
+            </a>
+          </div>
+        {% else %}
+          <div class="auth-buttons" style="display: flex; gap: 10px;">
+            <a href="{% url 'films:login' %}" class="steam-btn steam-btn-primary" style="width: auto; padding: 8px 16px; background: linear-gradient(to bottom, #90c941 0%, #266b04 100%);">
+              Войти
+            </a>
+            <a href="{% url 'films:register' %}" class="steam-btn" style="width: auto; padding: 8px 16px; background: linear-gradient(to bottom, #6992eb 0%, #3a4db9 100%);">
+              Регистрация
+            </a>
+          </div>
+        {% endif %}
+          <div class="theme-wrapper">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Перемикання теми">
+      <i class="fas fa-bars"></i>
+    </button>
+          <div id="theme-menu" class="theme-menu" hidden>
+            <button class="theme-toggle-dark" id="theme-toggle-dark" aria-label="Темна тема">
+              <i class="fas fa-moon"></i>
+            </button>
+            <button class="theme-toggle-light" id="theme-toggle-light" aria-label="Світла тема">
+              <i class="fas fa-sun"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="steam-container">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Категории Фильмов</div>
+        <div class="category-list">
+          <a href="?" class="category-item {% if not request.GET.category %}active{% endif %}">
+            <span class="category-icon">🎮</span>
+            <span class="category-name">Всё рекомендуемое</span>
+            <span class="category-count">({{ total_films_count }})</span>
+          </a>
+          {% for cat in categories %}
+            <a href="?category={{ cat.slug }}" class="category-item {% if request.GET.category == cat.slug %}active{% endif %}">
+              <span class="category-icon">{{ cat.icon|default:"🎬" }}</span>
+              <span class="category-name">{{ cat.name }}</span>
+              <span class="category-count">({{ cat.get_films_count }})</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      
+<!--      {% if selected_category and selected_category.description %}
+        <div class="sidebar-section" style="margin-top: 20px;">
+          <div class="sidebar-title">О КАТЕГОРИИ</div>
+          <div class="category-description">
+            <p>{{ selected_category.description }}</p>
+          </div>
+        </div>
+      {% endif %} -->
+      
+      <div class="sidebar-section" style="margin-top: 20px;">
+        <div class="sidebar-title">Указать Цену</div>
+        <form method="get" action="." class="filters-form">
+          {% if request.GET.category %}
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+          {% endif %}
+          {% if request.GET.q %}
+            <input type="hidden" name="q" value="{{ request.GET.q }}">
+          {% endif %}
+          <div class="filter-group">
+            <label style="color: var(--text-title); font-size: 12px; margin-bottom: 5px; display: block;">Цена от:</label>
+            <input type="number" name="min_price" value="{{ min_price }}" placeholder="0" step="0.01" class="form-input" style="width: 100%;">
+          </div>
+          <div class="filter-group" style="margin-top: 10px;">
+            <label style="color: var(--text-title); font-size: 12px; margin-bottom: 5px; display: block;">Цена до:</label>
+            <input type="number" name="max_price" value="{{ max_price }}" placeholder="9999" step="0.01" class="form-input" style="width: 100%;">
+          </div>
+          <div class="filter-group" style="margin-top: 15px;">
+            <label style="color: var(--text-title); font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" name="featured" {% if featured_only %}checked{% endif %} style="cursor: pointer;">
+              <span>Только рекомендуемые</span>
+            </label>
+          </div>
+          <button type="submit" class="steam-btn steam-btn-primary" style="width: 100%; margin-top: 15px; padding: 10px;">
+            Применить фильтры
+          </button>
+          {% if min_price or max_price or featured_only %}
+            <a href="?" class="steam-btn" style="width: 100%; margin-top: 10px; background: linear-gradient(to bottom, #3d5a7a 0%, #2a475e 100%); text-align: center; display: block; padding: 10px;">
+              Сбросить
+            </a>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+
+    <div class="main-content">
+      {% if selected_category %}
+        <div class="category-header" style="margin-bottom: 25px;">
+          <div class="category-header-icon">{{ selected_category.icon|default:"🎬" }}</div>
+          <div class="category-header-info">
+            <h1 class="category-header-title">{{ selected_category.name }}</h1>
+            {% if selected_category.description %}
+              <p class="category-header-description">{{ selected_category.description }}</p>
+            {% endif %}
+            <div class="category-header-stats">
+              <span>{{ selected_category.get_films_count }} результатов</span>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if films %}
+        <div class="films-grid">
+          {% for g in films %}
+            <div class="steam-film-card">
+              <a href="{{ g.get_absolute_url }}" class="film-card-link">
+                <div class="film-card-image" style="background-color:#000;">
+                  {% comment %}Try to use uploaded file first, then URL. Use an <img> with onerror fallback so broken src doesn't show broken icon.{% endcomment %}
+                  {% if g.image_file or g.image %}
+                    <img src="{% if g.image_file %}{{ g.image_file.url }}{% else %}{{ g.image }}{% endif %}" alt="{{ g.title }}" class="film-img" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                  {% else %}
+                    <div class="film-placeholder">
+                      <span class="placeholder-icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    </div>
+                  {% endif %}
+                  {% if g.featured %}
+                    <div class="featured-badge">РЕКОМЕНДУЕМОЕ</div>
+                  {% endif %}
+                </div>
+                <div class="film-card-info">
+                  <div class="film-card-title">{{ g.title }}</div>
+                  <div class="film-card-price">
+                    {% if g.price > 0 %}
+                      {{ g.price|floatformat:0 }} ₴
+                    {% else %}
+                      Бесплатно
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+              <div class="film-card-actions">
+                <a href="{% url 'films:favorites_toggle' g.slug %}?next={{ request.path }}" class="steam-btn steam-btn-primary">
+                  <span class="btn-icon"><i class="fa-solid fa-star"></i></span>
+                  <span>В избранное</span>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fa-solid fa-clapperboard"></i></div>
+          <div class="empty-title">Видеоконтент не найден</div>
+          <div class="empty-text">Попробуйте изменить параметры поиска!</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</body>
+
+<footer>
+  <div style="text-align: center; padding: 15px; color: var(--text-muted); font-size: 13px; border-top: 1px solid rgba(102,192,244,0.1);">
+    &copy; 2026 MovieZone. Все права защищены.
+  </div>
+</footer>
+
+</html>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: "Motiva Sans", "Segoe UI", Arial, sans-serif;
+
+    font-size: 14px;
+    line-height: 1.4;
+    --bg-main: #1b2838;
+   --bg-header: #171a21;
+   --bg-sidebar: #16202d;
+   --bg-card: #1e2329;
+  
+   --text-main: #c7d5e0;
+   --text-muted: #8f98a0;
+   --text-title: #ffffff;
+  
+   --accent: #66c0f4;
+}
+
+body.light-theme {
+  --bg-main: #f2f2f2;
+  --bg-header: #ffffff;
+  --bg-sidebar: #f7f7f7;
+  --bg-card: #ffffff;
+
+  --text-main: #1b2838;
+  --text-muted: #555;
+  --text-title: #000000;
+
+  --accent: #3d9bc4;
+}
+
+.steam-header {
+    background: var(--bg-header);
+    color: var(--text-main);
+    border-bottom: 1px solid #000;
+    box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header-content {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 104px;
+    gap: 30px;
+}
+.logo-section {
+    flex-shrink: 0;
+}
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #66c0f4;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border-radius: 11px;
+}
+.logo:hover {
+    color: #ffffff;
+}
+.main-nav {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+.nav-link {
+    padding: 0 20px;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    background: transparent;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+.nav-link:hover {
+    color: var(--text-title);
+    background: color-mix(in srgb, var(--text-title) 8%, transparent);
+}
+.nav-link.active {
+    color: var(--text-title);
+    border-bottom-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.search-section {
+    flex-shrink: 0;
+}
+.search-form {
+    display: flex;
+    align-items: center;
+    background: #316282;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.search-input {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #ffffff;
+    font-size: 13px;
+    width: 250px;
+    outline: none;
+}
+.search-input::placeholder {
+    color: #8f98a0;
+}
+.search-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #c7d5e0;
+    cursor: pointer;
+    font-size: 16px;
+}
+.search-btn:hover {
+    color: #ffffff;
+}
+.cart-link {
+  font-size: 20px;
+  color: var(--text-title);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+.cart-link:hover {
+  color: var(--text-main);
+  background: rgba(255,255,255,0.03);
+}
+/* Обёртка для бургера и меню */
+.theme-wrapper {
+  position: relative;   /* контекст позиционирования для .theme-menu */
+  display: inline-block;
+  margin-left: auto;    /* запасная страховка — прижать вправо */
+}
+
+/* Стили для кнопки-бургер */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: inherit;
+  padding: 8px;
+}
+
+.theme-toggle:hover {
+  background-color: #868282;
+  border-radius: 6px;
+}
+
+/* Меню выбора темы — выпадает ПРАВОЕ относительно .theme-wrapper */
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 6px); /* немного ниже кнопки */
+  right: 0;               /* прижать к правому краю wrapper'а */
+  background: #ffffff;
+  border: 1px solid #726a6a;
+  border-radius: 10px;
+  padding: 6px 8px;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(231, 9, 9, 0.2);
+  z-index: 3000;
+
+  /* плавное появление */
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* Видимое меню */
+.theme-menu:not([hidden]) {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Скрытое меню — полностью убираем из потока */
+.theme-menu[hidden] {
+  display: none;
+}
+
+/* Кнопки внутри меню */
+.theme-toggle-dark,
+.theme-toggle-light {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.12s ease, transform 0.08s ease;
+}
+
+.theme-toggle-dark:hover,
+.theme-toggle-light:hover {
+  background-color: rgba(0,0,0,0.06);
+  transform: scale(1.08);
+}
+
+/* Сохраняем темы для body */
+body.dark-theme { background-color: #111; color: #d8d1d1; }
+body.light-theme { background-color: #d1cccc; color: #ffffff; }
+
+.steam-container {
+    max-width: 1920px;
+    margin: 0 auto;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+}
+.sidebar-section {
+    background: var(--bg-sidebar);
+    border-radius: 3px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+.sidebar-title {
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(102,192,244,0.2);
+}
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.category-item {
+    padding: 10px 12px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.category-item:hover {
+  background: rgba(102,192,244,0.15);
+}
+.category-item.active {
+    background: var(--accent);
+    color: var(--bg-main);
+    font-weight: 500;
+}
+.category-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+.category-name {
+    flex: 1;
+}
+.category-count {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-left: auto;
+}
+.category-item.active .category-count {
+    opacity: 0.8;
+}
+.category-description {
+    color: #c7d5e0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.category-description p {
+    margin: 0;
+}
+.filters-form {
+    display: flex;
+    flex-direction: column;
+}
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-input {
+    background: rgba(27,40,56,0.8);
+    border: 1px solid rgba(102,192,244,0.2);
+    border-radius: 15px;
+    padding: 8px;
+    color: #c7d5e0;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.form-input:focus {
+    border-color: #66c0f4;
+    background: rgba(27,40,56,1);
+}
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+.category-header {
+    background: linear-gradient(135deg, #1e2329 0%, #2a475e 100%);
+    border-radius: 3px;
+    padding: 25px;
+    border: 1px solid rgba(102,192,244,0.1);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+.category-header-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(102,192,244,0.1);
+    border-radius: 8px;
+}
+.category-header-info {
+    flex: 1;
+}
+.category-header-title {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+}
+.category-header-description {
+    color: #c7d5e0;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 15px 0;
+}
+.category-header-stats {
+    color: #8f98a0;
+    font-size: 13px;
+}
+.films-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.steam-film-card {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: all 0.2s;
+    border: 1px solid rgba(102,192,244,0.1);
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+}
+.steam-film-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    border-color: rgba(102,192,244,0.3);
+}
+
+.steam-film-card:nth-child(1) { animation-delay: 0.12s; }
+.steam-film-card:nth-child(2) { animation-delay: 0.17s; }
+.steam-film-card:nth-child(3) { animation-delay: 0.22s; }
+.steam-film-card:nth-child(4) { animation-delay: 0.27s; }
+.steam-film-card:nth-child(5) { animation-delay: 0.32s; }
+.steam-film-card:nth-child(6) { animation-delay: 0.37s; }
+.film-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.film-card-image {
+    width: 100%;
+    height: 384px;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+.film-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.film-card-image.image-error {
+  background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.film-card-image.image-error::after {
+  content: '🎬';
+  font-size: 48px;
+  color: rgba(199,213,224,0.35);
+}
+.steam-film-card:hover .film-img {
+    transform: scale(1.05);
+}
+.film-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+}
+.placeholder-icon {
+    font-size: 80px;
+    opacity: 0.3;
+}
+.featured-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(102,192,244,0.9);
+    color: #1b2838;
+    padding: 4px 8px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.film-card-info {
+    padding: 12px;
+    min-height: 80px;
+}
+.film-card-title {
+    color: var(--text-main);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 38px;
+}
+.film-card-price {
+    color: #beee11;
+    font-size: 16px;
+    font-weight: 600;
+}
+.film-card-actions {
+    padding: 8px 12px 12px;
+    border-top: 1px solid rgba(102,192,244,0.1);
+}
+.steam-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: linear-gradient(to bottom, #75b022 0%, #558a0f 100%);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.15s;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+.steam-btn:hover {
+    background: linear-gradient(to bottom, #8bc924 0%, #6ba012 100%);
+    box-shadow: 0 0 8px rgba(117,176,34,0.4);
+}
+.steam-btn-primary {
+    background: linear-gradient(to bottom, #66c0f4 0%, #3d9bc4 100%);
+}
+.steam-btn-primary:hover {
+    background: linear-gradient(to bottom, #7dd0ff 0%, #4db0e0 100%);
+    box-shadow: 0 0 8px rgba(102,192,244,0.4);
+}
+.btn-icon {
+    font-size: 14px;
+}
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+.empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+.empty-title {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.empty-text {
+    color: #8f98a0;
+    font-size: 14px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+    .steam-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+    }
+    .films-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    .header-content {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 15px 20px;
+    }
+    .main-nav {
+        order: 3;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .nav-link {
+        height: 50px;
+        flex: 1;
+        justify-content: center;
+    }
+}
+@media (max-width: 768px) {
+    .films-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    .film-card-image {
+        height: 250px;
+    }
+    .search-input {
+        width: 150px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("theme-toggle");
+  const menu = document.getElementById("theme-menu");
+
+  if (!toggleBtn || !menu) return;
+
+  toggleBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
+
+  document.addEventListener("click", () => {
+    menu.hidden = true;
+  });
+
+  document.getElementById("theme-toggle-dark")?.addEventListener("click", () => {
+    document.body.classList.add("dark-theme");
+    document.body.classList.remove("light-theme");
+    menu.hidden = true;
+  });
+
+  document.getElementById("theme-toggle-light")?.addEventListener("click", () => {
+    document.body.classList.add("light-theme");
+    document.body.classList.remove("dark-theme");
+    menu.hidden = true;
+  });
+});
+</script>

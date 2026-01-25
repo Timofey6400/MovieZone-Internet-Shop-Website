@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MovieZone Регистер</title>
+   <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<script src="{% static 'js/script.js' %}" defer></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="steam-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img class="logo" src="{% static 'films\logo.png' %}" width="175px" height="75px" border-radius="10px" alt="Logotype">
+      </div>
+      <nav class="main-nav">
+        <a href="{% url 'films:index' %}" class="nav-link">МАГАЗИН</a>
+        <a href="{% url 'films:library' %}" class="nav-link">БИБЛИОТЕКА</a>
+        <a href="{% url 'films:community' %}" class="nav-link">СООБЩЕСТВО</a>
+        <a href="{% url 'films:favorites_list' %}" class="nav-link">ИЗБРАННОЕ</a>
+      </nav>
+      <div class="search-section">
+        <a href="{% url 'films:login' %}" class="steam-btn steam-btn-primary" style="width: auto; padding: 8px 16px;">
+          Войти
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="steam-container">
+    <div class="auth-page">
+      <div class="auth-container">
+        <h1 class="auth-title">РЕГИСТРАЦИЯ</h1>
+        <p class="auth-subtitle">Создайте аккаунт</p>
+        
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="message message-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+            <div class="form-errors">
+              {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                  <div class="error-message">{{ error }}</div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="form-group">
+            {{ form.username }}
+          </div>
+          
+          <div class="form-group">
+            {{ form.email }}
+          </div>
+          
+          <div class="form-group">
+            {{ form.password1 }}
+            {% if form.password1.help_text %}
+              <small class="form-help">{{ form.password1.help_text }}</small>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            {{ form.password2 }}
+            {% if form.password2.help_text %}
+              <small class="form-help">{{ form.password2.help_text }}</small>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="steam-btn steam-btn-primary" style="width: 100%;">
+            Зарегистрироваться
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Уже есть аккаунт? <a href="{% url 'films:login' %}">Войти</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background: #1b2838;
+    font-family: "Motiva Sans", "Segoe UI", Arial, sans-serif;
+    color: #c7d5e0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.steam-header {
+    background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+    border-bottom: 1px solid #000;
+    box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header-content {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 104px;
+    gap: 30px;
+}
+.logo-section {
+    flex-shrink: 0;
+}
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #66c0f4;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border-radius: 11px;
+}
+.logo:hover {
+    color: #ffffff;
+}
+.main-nav {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+.nav-link {
+    padding: 0 20px;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    color: #b8b6b4;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+.nav-link:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.05);
+}
+.steam-container {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+}
+.auth-container {
+    background: linear-gradient(135deg, #1e2329 0%, #2a475e 100%);
+    border-radius: 3px;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid rgba(102,192,244,0.1);
+}
+.auth-title {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.auth-subtitle {
+    color: #8f98a0;
+    font-size: 14px;
+    text-align: center;
+    margin: 0 0 30px 0;
+}
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.form-input {
+    background: rgba(27,40,56,0.8);
+    border: 1px solid rgba(102,192,244,0.2);
+    border-radius: 3px;
+    padding: 12px;
+    color: #c7d5e0;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.form-input:focus {
+    border-color: #66c0f4;
+    background: rgba(27,40,56,1);
+}
+.form-help {
+    color: #8f98a0;
+    font-size: 12px;
+}
+.form-errors {
+    background: rgba(168,72,40,0.2);
+    border: 1px solid rgba(168,72,40,0.5);
+    border-radius: 3px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+.error-message {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin: 5px 0;
+}
+.messages {
+    margin-bottom: 20px;
+}
+.message {
+    padding: 12px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+.message-success {
+    background: rgba(117,176,34,0.2);
+    border: 1px solid rgba(117,176,34,0.5);
+    color: #beee11;
+}
+.message-error {
+    background: rgba(168,72,40,0.2);
+    border: 1px solid rgba(168,72,40,0.5);
+    color: #ff6b6b;
+}
+.auth-footer {
+    margin-top: 25px;
+    text-align: center;
+    color: #8f98a0;
+    font-size: 13px;
+}
+.auth-footer a {
+    color: #66c0f4;
+    text-decoration: none;
+}
+.auth-footer a:hover {
+    color: #ffffff;
+}
+.steam-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: linear-gradient(to bottom, #66c0f4 0%, #3d9bc4 100%);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.15s;
+    border: none;
+    cursor: pointer;
+}
+.steam-btn-primary {
+    background: linear-gradient(to bottom, #66c0f4 0%, #3d9bc4 100%);
+}
+.steam-btn-primary:hover {
+    background: linear-gradient(to bottom, #7dd0ff 0%, #4db0e0 100%);
+    box-shadow: 0 0 8px rgba(102,192,244,0.4);
+}
+</style>
+
+
+
+
