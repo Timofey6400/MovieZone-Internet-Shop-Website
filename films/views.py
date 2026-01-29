@@ -132,7 +132,7 @@ def favorites_toggle(request, slug):
     else:
         favs.append(slug)
     request.session["favorites"] = favs
-    # redirect обратно на страницу откуда пришли или на деталь игры
+    # redirect обратно на страницу откуда пришли или на деталь
     next_url = request.GET.get("next") or request.META.get("HTTP_REFERER") or "/"
     return redirect(next_url)
 
@@ -146,8 +146,8 @@ def community(request):
     return render(request, "films/community.html")
 
 def library(request):
-    """Страница библиотеки игр пользователя"""
-    # Получаем игры из сессии (можно расширить для реальной библиотеки)
+    """Страница библиотеки фильмов пользователя"""
+    # Получаем фильмы из сессии (можно расширить для реальной библиотеки)
     library_slugs = request.session.get("library", [])
     films = Film.objects.filter(slug__in=library_slugs)
     return render(request, "films/library.html", {"films": films})

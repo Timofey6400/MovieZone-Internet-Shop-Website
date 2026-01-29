@@ -17,7 +17,7 @@
         <img class="logo" src="{% static 'films\logo.png' %}" width="175px" height="75px" border-radius="10px" alt="Logotype">
       </div>
         <div class="header-actions">
-          <a href="{% url 'films:cart' %}" class="cart-link" title="Корзина"><i class="fa-solid fa-cart-shopping"></i></a>
+          <a href="{% url 'films:cart' %}" class="cart-link" title="Корзина" aria-label="Корзина"><i class="fa-solid fa-cart-shopping"></i></a>
         </div>
       <nav class="main-nav">
         <a href="{% url 'films:index' %}" class="nav-link">МАГАЗИН</a>
@@ -206,6 +206,20 @@ body {
 }
 .search-btn:hover {
     color: #ffffff;
+}
+.cart-link {
+  font-size: 20px;
+  color: var(--text-title);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+.cart-link:hover {
+  color: var(--text-main);
+  background: rgba(255,255,255,0.03);
 }
 .steam-container {
     max-width: 1920px;
