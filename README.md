@@ -25,7 +25,7 @@
 
 2. **Install dependencies:**
 It is recommended to use a virtual environment.
-```
+```bash
   pip install -r requirements.txt
 
 Apply migrations:
