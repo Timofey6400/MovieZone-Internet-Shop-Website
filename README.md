@@ -20,26 +20,29 @@
 
 1. **Clone the repository:**
    ```bash
+   
    git clone [https://github.com/Timofey6400/MovieZone-Internet-Shop-Website.git](https://github.com/Timofey6400/MovieZone-Internet-Shop-Website.git)
    cd MovieZone-Internet-Shop-Website
 
 2. **Install dependencies:**
 It is recommended to use a virtual environment.
-```bash
-  pip install -r requirements.txt
 
-Apply migrations:
+   ```bash
+     pip install -r requirements.txt
+
+3. **Apply migrations:**
 Set up your local database.
 
-  python manage.py migrate
+   ```bash
+     python manage.py migrate
 
-Run the server:
+4. **Run the server:**
+   ```bash
+     python manage.py runserver
+Then open http://127.0.0.1:8000/ in your browser.
 
-  python manage.py runserver
-*Open http://127.0.0.1:8000/ in your browser.
-```
+### 🛠 Tech Stack
+* Backend: Python, Django
+* Frontend: HTML5, CSS3 (Netflix-inspired styling)
+* Database: SQLite3 (default)
 
-🛠 Tech Stack
-Backend: Python, Django
-Frontend: HTML5, CSS3 (Netflix-inspired styling)
-Database: SQLite3 (default)
